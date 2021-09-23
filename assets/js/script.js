@@ -17,6 +17,70 @@ var createTask = function (taskText, taskDate, taskList) {
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
 };
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerane: "touch",
+  drop: function(event, ui){
+    ui.droppable.remove();
+    console.log("drop");
+  },
+  over: function(event, ui){
+    console.log("over");
+  },
+  out: function(event, ui){
+    console.log("out");
+  }
+});
+
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+  activate: function (event) {
+    console.log("activate", this);
+  },
+  deactivate: function (event) {
+    console.log("deactivate", this);
+  },
+  over: function (event) {
+    console.log("over", event.target);
+
+  },
+  out: function (event) {
+    console.log("out", event.target);
+  },
+  // loop over current set of children in sortable list
+  update: function(event){
+    $(this).children().each(function(){
+var arrName = $(this)
+.attr("id")
+.replace("list-", "");
+tasks[arrName] = tempArr;
+saveTasks();
+
+      var tempArr = [];
+var text = $(this)
+.find("p")
+.text()
+.trim();
+
+var date = $(this)
+.find("span")
+.text()
+.trim();
+
+//add task data to the temp array
+tempArr.push({
+  text: text,
+  date: date
+});
+      console.log(tempArr);
+    });
+  }
+  
+
+});
 
 var loadTasks = function () {
   tasks = JSON.parse(localStorage.getItem("tasks"));
@@ -79,48 +143,48 @@ $(".list-group").on("blur", "textarea", function () {
   //replace textarea with p element
   $(this).replaceWith(taskP);
 });
-$(".list-group").on("click", "span", function(){
+$(".list-group").on("click", "span", function () {
   //get the date written
-var date = $(this)
-.text()
-.trim();
-//create new input el
-var dateInput = $("input")
-.attr("type", "text")
-.addClass("form-control")
-.val(date);
+  var date = $(this)
+    .text()
+    .trim();
+  //create new input el
+  var dateInput = $("input")
+    .attr("type", "text")
+    .addClass("form-control")
+    .val(date);
 
-//swaps els
-$(this).replaceWith(dateInput);
+  //swaps els
+  $(this).replaceWith(dateInput);
 
-//automatically focus on new element
-dateInput.trigger("focus");
+  //automatically focus on new element
+  dateInput.trigger("focus");
 
 });
 
-$(".list-group").on("blur", "input[type='text']", function(){
-var date =$(this)
-.val()
-.trim();
+$(".list-group").on("blur", "input[type='text']", function () {
+  var date = $(this)
+    .val()
+    .trim();
 
-var status = $(this)
-.closest(".list-group")
-.attr("id")
-.replace("list-", "");
+  var status = $(this)
+    .closest(".list-group")
+    .attr("id")
+    .replace("list-", "");
 
-var index = $(this)
-.closest(".list-group-item")
-.index();
+  var index = $(this)
+    .closest(".list-group-item")
+    .index();
 
-tasks[status][index].date = date;
-saveTasks();
+  tasks[status][index].date = date;
+  saveTasks();
 
-var taskSpan = $("<span>")
-.addClass("badge badge-primary badge-pill")
-.text(date);
+  var taskSpan = $("<span>")
+    .addClass("badge badge-primary badge-pill")
+    .text(date);
 
 
-$(this).replaceWith(taskSpan);
+  $(this).replaceWith(taskSpan);
 
 });
 
